@@ -65,10 +65,12 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'guards' => [
+            'api' => [
+                'driver' => 'sanctum',
+                'provider' => 'users',
+            ],
+        ],
     ],
 
     /*

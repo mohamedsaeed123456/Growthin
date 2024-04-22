@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Console\Commands\ResetOTPResendCount;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -25,7 +27,13 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(Verified::class, function ($event) {
+            $user = $event->user;
+            if ($user->otp_resend_count >= 5) {
+                Log::info('User object:', ['user' => $user]);
+                event(new ResetOTPResendCount($user));
+            }
+        });
     }
 
     /**

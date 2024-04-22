@@ -2,44 +2,51 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    use HasApiTokens, HasFactory, Notifiable,SoftDeletes;
+    protected $table = 'users';
     protected $fillable = [
-        'name',
         'email',
+        'email_verified',
         'password',
+        'password_confirmation',
+        'role',
+        'otp_resend_count',
+        'is_suspended',
+        'is_deleted',
     ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
+        'created_at' => 'datetime:d-m-Y',
+        'updated_at' => 'datetime:d-m-Y',
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'deleted_at' => 'datetime:d-m-Y',
     ];
+    public function account()
+    {
+        return $this->hasOne(Account::class, 'user_id', 'id');
+    }
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+    public function questions() {
+        return $this->hasOne(Question::class);
+    }
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
 }
