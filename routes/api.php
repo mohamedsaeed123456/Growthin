@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CMS\CommentController;
 use App\Http\Controllers\Login_Registration\EmailVerificationController;
 use App\Http\Controllers\Billing_Subscription\PaymentController;
 use App\Http\Controllers\Billing_Subscription\QuestionController;
@@ -28,11 +29,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('questions_continue', [QuestionController::class, 'onBoardingContinue']);
         Route::post('questions_store' , [QuestionController::class , 'onBoardingStore']);
     });
-    Route::post('add_content' , [PostController::class , 'store_content']);
+    Route::post('add_content/{id}' , [PostController::class , 'store_content']);
     Route::get('users' , [UserController::class , 'fetchUser']);
     Route::get('posts' , [PostController::class , 'fetchPost']);
     Route::post('campaigns' , [CampaignController::class , 'storeCampaign']);
     Route::get('campaigns' , [CampaignController::class , 'fetchCampaign']);
+    Route::post('update-campaign/{id}' , [CampaignController::class , 'updateCampaigm']);
+    Route::delete('delete-campaign/{id}' , [CampaignController::class , 'destroyCampaign']);
+    Route::get('posts/{id}' , [PostController::class , 'fetchPostUser']);
+    Route::post('comments' , [CommentController::class , 'storeComment']);
+    Route::get('comments/{id}' , [CommentController::class , 'fetchComment']);
+    Route::post('publish-content' , [PostController::class , 'publishContent']);
+    Route::post('approve-content/{id}' , [PostController::class , 'approveContent']);
+    Route::post('update-content/{id}' , [PostController::class , 'updateContent']);
+    Route::get('fetch_content_version' , [PostController::class , 'fetchContentVersion']);
+    Route::post('approve-version/{id}' , [PostController::class , 'approveVersion']);
+
 });
 
 Route::post('login' , [UserController::class , 'login']);

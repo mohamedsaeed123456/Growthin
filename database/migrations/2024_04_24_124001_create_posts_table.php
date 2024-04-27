@@ -19,10 +19,7 @@ return new class extends Migration
             $table->json('content_type')->nullable();
             $table->string('post_content',3000)->nullable();
             $table->string('content_image')->nullable();
-            $table->date('publication_date')->nullable();
-            $table->string('client_status')->nullable();
-            $table->string('operation_status')->nullable();
-            $table->string('manager_status')->nullable();
+            $table->dateTime('publication_date')->nullable();
             $table->boolean('isPublished')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
