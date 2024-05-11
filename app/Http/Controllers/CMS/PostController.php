@@ -10,6 +10,8 @@ use App\Models\PostVersion;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
+
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -40,8 +42,13 @@ class PostController extends Controller
             $post->post_content = $request->input('post_content');
             $post->isPublished = false;
             if ($request->hasFile('content_image')) {
-                $imageName = time().'.'.$request->content_image->extension();
-                $request->content_image->move(public_path('images'), $imageName);
+                $uploadedFile = $request->file('content_image');
+                $imageName = time().'.'.$uploadedFile->getClientOriginalExtension();
+                $image = Image::make($uploadedFile)->resize(800, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                })->encode('jpg', 80);
+                $image->save(public_path('images/' . $imageName));
                 $post->content_image = $imageName;
             }
             $date = Carbon::parse( $request->input('publication_date'));
@@ -57,6 +64,7 @@ class PostController extends Controller
                 'oldVersion_id' => $post->id,
                 'submission_date_time' => $formattedDate,
                 'selected' => true,
+                'creator_id' => $user->id,
             ]);
             $version->save();
                 return response()->json([
@@ -288,6 +296,7 @@ class PostController extends Controller
             $date = Carbon::parse( $request->input('publication_date'));
             $formattedDate = $date->toDateTimeString();
             $post->publication_date = $formattedDate;
+            $user = $request->user();
             $post->campaign_id = $request->input('campaign_id')? $request->input('campaign_id'):null;
             $post->save();
             $version = new PostVersion([
@@ -295,6 +304,7 @@ class PostController extends Controller
                 'oldVersion_id' =>$oldVersion->id,
                 'submission_date_time' => $formattedDate,
                 'selected' => false,
+                'creator_id' => $user->id,
             ]);
             $oldVersion->delete();
             $version->save();
@@ -305,17 +315,35 @@ class PostController extends Controller
             ]);
         }
     }
-    public function fetchContentVersion(Request $request){
+    public function fetchContentVersion(Request $request,$id){
         $user = $request->user();
-        $posts = Post::where('user_id', $user->id)->get();
-        if(!$posts->isEmpty()){
-            foreach ($posts as $post) {
-                $postVersions = PostVersion::where('post_id', $post->id)->orderBy('id' , 'desc')->get();
-            }
+        $postVersions = PostVersion::where('post_id', $id)->orderBy('id' , 'desc')->get();
             if(!$postVersions->isEmpty()) {
+                $userids=[];
+                $allAccounts = [];
+                foreach($postVersions as $version){
+                    $userids[] = $version->creator_id;
+                }
+                foreach ($userids as $id) {
+                    $Companies = Account::where('user_id' ,$id)->get();
+                    $allAccounts = array_merge($allAccounts, $Companies->toArray());
+                }
+                $userNames = [];
+                foreach ($allAccounts as $account) {
+                    $userId = $account['user_id'];
+                    $userName = $account['user_name'];
+                    $userNames[$userId] = $userName;
+                }
+                $versionsWithUserNames = [];
+                foreach ($postVersions as $version) {
+                    $userId = $version->creator_id;
+                    $versionData = $version->toArray();
+                    $versionData['user_name'] = $userNames[$userId];
+                    $versionsWithUserNames[] = $versionData;
+                }
                 return response()->json([
                     'status' => 200,
-                    'postVersions' => $postVersions,
+                    'postVersions' => $versionsWithUserNames,
                 ]);
             }
             else{
@@ -324,14 +352,6 @@ class PostController extends Controller
                     'error' => 'لا يوجد اصدارات بعد',
                 ]);
             }
-        }
-        else{
-            return response()->json([
-                'status' => 404,
-                'error' => 'لا يوجد محتوي بعد لهذا العميل',
-            ]);
-        }
-
     }
 
 

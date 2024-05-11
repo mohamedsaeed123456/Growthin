@@ -8,6 +8,7 @@ use App\Http\Controllers\CMS\CampaignController;
 use App\Http\Controllers\CMS\PostController;
 use App\Http\Controllers\Login_Registration\ResetPasswordController;
 use App\Http\Controllers\Login_Registration\UserController;
+use App\Http\Controllers\Meetings\MeetingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,8 +43,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('publish-content' , [PostController::class , 'publishContent']);
     Route::post('approve-content/{id}' , [PostController::class , 'approveContent']);
     Route::post('update-content/{id}' , [PostController::class , 'updateContent']);
-    Route::get('fetch_content_version' , [PostController::class , 'fetchContentVersion']);
+    Route::get('fetch_content_version/{id}' , [PostController::class , 'fetchContentVersion']);
     Route::post('approve-version/{id}' , [PostController::class , 'approveVersion']);
+    Route::post('meetings' ,[MeetingController::class , 'storeMeeting']);
+    Route::get('meetings' ,[MeetingController::class , 'fetchMeeting']);
+    Route::post('meeting-slots' ,[MeetingController::class , 'storeMeetingSlots']);
+    Route::get('meeting-slots' ,[MeetingController::class , 'fetchMeetingSlots']);
+    Route::get('meeting-slots-client' ,[MeetingController::class , 'fetchMeetingSlotsClient']);
+    Route::post('meeting-link/{id}' ,[MeetingController::class , 'updateMeetingLink']);
+    Route::post('meeting-summary/{id}' ,[MeetingController::class , 'updateMeetingSummary']);
+    Route::get('meeting-plan/{id}' ,[MeetingController::class , 'fetchMeetingPlan']);
+    Route::post('meeting-date/{id}' ,[MeetingController::class , 'updateMeetingDate']);
+    Route::delete('meeting-date/{id}' ,[MeetingController::class , 'destroyMeetingDate']);
+    Route::get('meeting-company/{id}' ,[MeetingController::class , 'fetchComapnyData']);
+
+
 
 });
 

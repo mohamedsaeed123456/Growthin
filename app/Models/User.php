@@ -53,9 +53,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
-    public function postClientStatus()
-    {
-        return $this->hasMany(PostClientStatus::class, 'client_id');
-    }
 
+    public function meetings() {
+        return $this->hasMany(Meeting::class);
+    }
+    public function meeting_slots() {
+        return $this->hasMany(MeetingSlots::class);
+    }
 }

@@ -261,6 +261,18 @@ return [
         'profile_image' => [
             'required' => 'هذا الحقل مطلوب',
         ],
+        'meeting_type' => [
+            'required' => 'هذا الحقل مطلوب',
+        ],
+        'meeting_title' => [
+            'required' => 'هذا الحقل مطلوب',
+        ],
+        'meeting_date' => [
+            'required' => 'هذا الحقل مطلوب',
+        ],
+        'meeting_plan' => [
+            'required' => 'هذا الحقل مطلوب',
+        ],
     ],
 
     /*

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PostVersion extends Model
 {
     use HasFactory;
-    protected $fillable = ['post_id','oldVersion_id', 'submission_date_time', 'selected'];
+    protected $fillable = ['post_id','oldVersion_id', 'submission_date_time', 'selected','creator_id'];
 
     public function post() {
         return $this->belongsTo(Post::class);
